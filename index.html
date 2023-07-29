@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Zen-Hub KeySystem</title>
+  <style>
+body {
+      background-color: black;
+      background-position: top left;
+      background-size: auto;
+      background-repeat: no-repeat;
+    }
+    #center-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    #text-label {
+      color: white;
+      font-size: 24px;
+    }
+    #generate-key-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #337ab7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #subscribe-button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #337ab7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #output-container {
+      display: none;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    #copy-button {
+      background-color: #337ab7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    @keyframes waterSplosh {
+      0% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+    .water-splosh-animation {
+      animation: waterSplosh 0.5s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <div id="center-container">
+    <div id="text-label">Zen-Hub KeySystem</div>
+    <button id="generate-key-button" onclick="generateKey()" disabled>Generate Key</button>
+    <button id="subscribe-button" onclick="subscribeToChannel()">Subscribe to our YouTube channel</button>
+    <div id="output-container">
+      <button id="copy-button" onclick="copyToClipboard()">Copy Key</button>
+      <div id="generated-key"></div>
+    </div>
+  </div>
+
+  <script>
+    let isSubscribed = false;
+
+    function checkSubscriptionStatus() {
+      // Simulated API call
+      setTimeout(() => {
+        isSubscribed = true;
+        enableGenerateKeyButton();
+      }, 2000);
+    }
+
+    function enableGenerateKeyButton() {
+      const generateKeyButton = document.getElementById("generate-key-button");
+      generateKeyButton.disabled = !isSubscribed;
+    }
+
+    function subscribeToChannel() {
+      // Replace the URL with your YouTube channel URL
+      window.open("https://m.youtube.com/@ItzNpg", "_blank");
+      // After the user subscribes, you may call the checkSubscriptionStatus() function to update the status
+      checkSubscriptionStatus();
+    }
+
+    function validateGeneratedKey(generatedKey) {
+      // Replace "http://your-server-url.com:3000/validateKey" with your server's URL
+      const serverUrl = "http://your-server-url.com:3000/validateKey";
+      const requestData = JSON.stringify({ generatedKey: generatedKey });
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", serverUrl, true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.isValid) {
+              // Key is valid, enable the "Generate Key" button
+              document.getElementById("generate-key-button").disabled = false;
+            } else {
+              // Key is invalid, disable the "Generate Key" button
+              document.getElementById("generate-key-button").disabled = true;
+            }
+          } else {
+            console.error("Error while communicating with the server:", xhr.status);
+          }
+        }
+      };
+
+      xhr.send(requestData);
+    }
+
+    function generateKey() {
+      if (isSubscribed) {
+        const randomNumber = Math.floor(Math.random() * 10000000000);
+        const randomHash = Math.floor(Math.random() * 100000);
+        const key = `${randomNumber}#${randomHash}`;
+        document.getElementById("output-container").style.display = "block";
+        document.getElementById("generated-key").textContent = key;
+        document.getElementById("output-container").classList.add("water-splosh-animation");
+      } else {
+        alert("Please subscribe to our YouTube channel first to generate a key.");
+      }
+    }
+  </script>
+</body>
+</html>
